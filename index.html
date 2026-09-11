@@ -129,10 +129,34 @@
         border-color: var(--t3);
       }
 
+      .right-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-left: auto;
+      }
+
+      .filter-input {
+        background: var(--panel);
+        border: 1px solid var(--panel-edge);
+        color: var(--text);
+        padding: 9px 12px;
+        border-radius: 3px;
+        font-size: 14px;
+        font-family: "Inter", sans-serif;
+        width: 160px;
+      }
+      .filter-input:focus {
+        outline: none;
+        border-color: var(--t3);
+      }
+      .filter-input::placeholder {
+        color: var(--text-dim);
+      }
+
       .add-form {
         display: flex;
         gap: 8px;
-        margin-left: auto;
       }
 
       .add-form input {
@@ -423,11 +447,19 @@
         .stepper input {
           font-size: 12px;
         }
-        .add-form {
+        .right-controls {
           margin-left: 0;
           width: 100%;
+          flex-wrap: wrap;
+        }
+        .add-form {
+          flex: 1;
         }
         .add-form input {
+          flex: 1;
+          width: auto;
+        }
+        .filter-input {
           flex: 1;
           width: auto;
         }
@@ -464,14 +496,22 @@
 
       <div class="add-row" id="quick-add-row">
         <!-- quick add chips injected here -->
-        <div class="add-form">
+        <div class="right-controls">
           <input
             type="text"
-            id="new-orb-name"
-            placeholder="Add an orb type…"
-            maxlength="40"
+            id="filter-input"
+            class="filter-input"
+            placeholder="Filter orbs…"
           />
-          <button id="add-orb-btn">Add</button>
+          <div class="add-form">
+            <input
+              type="text"
+              id="new-orb-name"
+              placeholder="Add an orb type…"
+              maxlength="40"
+            />
+            <button id="add-orb-btn">Add</button>
+          </div>
         </div>
       </div>
 
@@ -479,6 +519,11 @@
         <strong>No orbs tracked yet</strong>
         Add the first orb type you're farming, then log your Tier I–V counts as
         you buy from the shop.
+      </div>
+
+      <div id="no-match-state" class="empty" style="display: none">
+        <strong>No orbs match your filter</strong>
+        Try a different search, or clear the filter box to see everything.
       </div>
 
       <div class="grid" id="orb-grid"></div>
@@ -531,6 +576,7 @@
 
       let orbs = load();
       let currentSort = "alphabetical";
+      let filterText = "";
 
       function load() {
         try {
@@ -655,26 +701,39 @@
       function render() {
         const grid = document.getElementById("orb-grid");
         const emptyState = document.getElementById("empty-state");
+        const noMatchState = document.getElementById("no-match-state");
         grid.innerHTML = "";
+
+        const sortedOrbs = getSortedOrbs();
+        const filteredOrbs = filterText
+          ? sortedOrbs.filter((o) => o.name.toLowerCase().includes(filterText))
+          : sortedOrbs;
 
         if (orbs.length === 0) {
           emptyState.style.display = "block";
+          noMatchState.style.display = "none";
+        } else if (filteredOrbs.length === 0) {
+          emptyState.style.display = "none";
+          noMatchState.style.display = "block";
         } else {
           emptyState.style.display = "none";
+          noMatchState.style.display = "none";
         }
 
         let totalLegendaries = 0;
         let craftedLegendaries = 0;
 
-        const sortedOrbs = getSortedOrbs();
+        orbs.forEach((orb) => {
+          const total = equivalentOf(orb.counts);
+          totalLegendaries += Math.floor(total / LEGENDARY_UNITS);
+          craftedLegendaries += orb.counts[4];
+        });
 
-        sortedOrbs.forEach((orb) => {
+        filteredOrbs.forEach((orb) => {
           const total = equivalentOf(orb.counts);
           const canCraft = Math.floor(total / LEGENDARY_UNITS);
           const alreadyCrafted = orb.counts[4];
           const unmergedLegendaries = canCraft - alreadyCrafted;
-          totalLegendaries += canCraft;
-          craftedLegendaries += orb.counts[4];
           const remainder = total % LEGENDARY_UNITS;
           const pct = Math.min(100, (remainder / LEGENDARY_UNITS) * 100);
           const isDone = total >= LEGENDARY_UNITS;
@@ -831,6 +890,11 @@
         div.textContent = str;
         return div.innerHTML;
       }
+
+      document.getElementById("filter-input").addEventListener("input", (e) => {
+        filterText = e.target.value.trim().toLowerCase();
+        render();
+      });
 
       document.getElementById("add-orb-btn").addEventListener("click", () => {
         const input = document.getElementById("new-orb-name");

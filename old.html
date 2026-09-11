@@ -12,17 +12,17 @@
     />
     <style>
       :root {
-        --bg: #0a0f18;
-        --panel: #111820;
-        --panel-edge: #1e2839;
-        --text: #d4e4f7;
-        --text-dim: #7a8fa8;
-        --t1: #6b8099;
-        --t2: #749baf;
-        --t3: #628b90;
-        --t4: #8e84bd;
-        --t5: #71b2bc;
-        --gold-glow: rgba(113, 178, 188, 0.4);
+        --bg: #1c1a16;
+        --panel: #262320;
+        --panel-edge: #3a352e;
+        --text: #eee7d8;
+        --text-dim: #9c9285;
+        --t1: #948c7a;
+        --t2: #7fae5c;
+        --t3: #4f9aa3;
+        --t4: #9b6bc4;
+        --t5: #d9a441;
+        --gold-glow: rgba(217, 164, 65, 0.4);
       }
 
       * {
@@ -39,7 +39,7 @@
       }
 
       .wrap {
-        max-width: 1120px;
+        max-width: 980px;
         margin: 0 auto;
       }
 
@@ -99,34 +99,21 @@
       }
 
       .chip {
-        background: var(--t3);
-        border: none;
-        color: #08131c;
-        padding: 9px 16px;
+        background: transparent;
+        border: 1px dashed var(--panel-edge);
+        color: var(--text-dim);
+        padding: 7px 14px;
         border-radius: 3px;
-        font-size: 14px;
+        font-size: 13px;
         cursor: pointer;
-        font-family: "Chakra Petch", sans-serif;
-        font-weight: 600;
-        transition: filter 0.15s ease;
+        font-family: "Inter", sans-serif;
+        transition:
+          border-color 0.15s ease,
+          color 0.15s ease;
       }
       .chip:hover {
-        filter: brightness(1.1);
-      }
-
-      .sort-dropdown {
-        background: var(--panel);
-        border: 1px solid var(--panel-edge);
-        color: var(--text);
-        padding: 9px 12px;
-        border-radius: 3px;
-        font-size: 14px;
-        font-family: "Inter", sans-serif;
-        cursor: pointer;
-      }
-      .sort-dropdown:focus {
-        outline: none;
         border-color: var(--t3);
+        color: var(--text);
       }
 
       .add-form {
@@ -182,14 +169,14 @@
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 18px;
       }
 
       .card {
         background: var(--panel);
         border: 1px solid var(--panel-edge);
-        padding: 18px 16px 20px;
+        padding: 18px 20px 20px;
         position: relative;
         clip-path: polygon(
           0 0,
@@ -229,7 +216,7 @@
 
       .legend-badge {
         flex-shrink: 0;
-        background: rgba(187, 155, 95, 0.14);
+        background: rgba(217, 164, 65, 0.14);
         border: 1px solid var(--gold-glow);
         color: var(--t5);
         font-family: "Chakra Petch", sans-serif;
@@ -262,7 +249,7 @@
       .tiers {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
-        gap: 5px;
+        gap: 6px;
         margin-bottom: 14px;
       }
 
@@ -305,7 +292,7 @@
         background: #131722;
         border: none;
         color: var(--text-dim);
-        width: 18px;
+        width: 20px;
         height: 26px;
         cursor: pointer;
         font-size: 13px;
@@ -407,21 +394,12 @@
       }
 
       @media (max-width: 520px) {
-        .grid {
-          grid-template-columns: 1fr;
-        }
         .tiers {
           grid-template-columns: repeat(5, 1fr);
           gap: 4px;
         }
         .tier .tlabel {
           font-size: 9px;
-        }
-        .stepper button {
-          width: 16px;
-        }
-        .stepper input {
-          font-size: 12px;
         }
         .add-form {
           margin-left: 0;
@@ -494,43 +472,14 @@
       const LEGENDARY_UNITS = 81;
       const TIER_LABELS = ["T1", "T2", "T3", "T4", "T5"];
       const SUGGESTED_ORBS = [
-        "Venom Shank",
-        "Tanker",
-        "Sweet Tooth",
-        "Rocket Jump",
-        "Refiller",
-        "Speedy Coil",
-        "Regeneration",
-        "Mutual-Support",
-        "Quick Reload",
-        "Frostbite",
-        "Life-Steal",
-        "Faster Bullet",
-        "Extra Bandages",
-        "Ego Expander",
-        "Energy Drink",
-        "Faster Arms",
-        "Flame Tongue",
-        "Donator",
-        "Doom's Touch",
-        "Damage Boost",
-        "Critical Aim",
-        "Cloak",
+        "Anti-Gravity",
+        "Auto-Heal",
         "Bad Breath",
         "Bigger Bomb",
-        "Coinsplosion",
-        "Auto-Heal",
-        "Death Bomb",
-        "Arthur's Sword",
-        "Quick Dash",
-        "Vampire",
-        "Anti-Gravity",
-        "Karma",
-        "Metabolism",
+        "Clock",
       ];
 
       let orbs = load();
-      let currentSort = "alphabetical";
 
       function load() {
         try {
@@ -632,26 +581,6 @@
         render();
       }
 
-      function getSortedOrbs() {
-        const sorted = [...orbs];
-        if (currentSort === "alphabetical") {
-          sorted.sort((a, b) => a.name.localeCompare(b.name));
-        } else if (currentSort === "most-completed") {
-          sorted.sort((a, b) => {
-            const aTotal = equivalentOf(a.counts);
-            const bTotal = equivalentOf(b.counts);
-            return bTotal - aTotal;
-          });
-        } else if (currentSort === "least-completed") {
-          sorted.sort((a, b) => {
-            const aTotal = equivalentOf(a.counts);
-            const bTotal = equivalentOf(b.counts);
-            return aTotal - bTotal;
-          });
-        }
-        return sorted;
-      }
-
       function render() {
         const grid = document.getElementById("orb-grid");
         const emptyState = document.getElementById("empty-state");
@@ -664,17 +593,10 @@
         }
 
         let totalLegendaries = 0;
-        let craftedLegendaries = 0;
 
-        const sortedOrbs = getSortedOrbs();
-
-        sortedOrbs.forEach((orb) => {
+        orbs.forEach((orb) => {
           const total = equivalentOf(orb.counts);
-          const canCraft = Math.floor(total / LEGENDARY_UNITS);
-          const alreadyCrafted = orb.counts[4];
-          const unmergedLegendaries = canCraft - alreadyCrafted;
-          totalLegendaries += canCraft;
-          craftedLegendaries += orb.counts[4];
+          totalLegendaries += Math.floor(total / LEGENDARY_UNITS);
           const remainder = total % LEGENDARY_UNITS;
           const pct = Math.min(100, (remainder / LEGENDARY_UNITS) * 100);
           const isDone = total >= LEGENDARY_UNITS;
@@ -711,7 +633,7 @@
         <div class="card-head">
           <div class="name-group">
             <div class="name">${escapeHtml(orb.name)}</div>
-            ${orb.counts[4] >= 1 ? `<span class="legend-badge">${orb.counts[4]}</span>` : ""}
+            ${orb.counts[4] >= 1 ? `<span class="legend-badge">${orb.counts[4]} Legendary${orb.counts[4] > 1 ? "s" : ""}</span>` : ""}
           </div>
           <div class="actions">
             <button class="icon-btn" data-action="remove" title="Remove orb type">Remove</button>
@@ -722,8 +644,8 @@
         <div class="card-foot">
           <div class="progress-text">
             ${
-              isDone && unmergedLegendaries > 0
-                ? `<span class="goldnum">${unmergedLegendaries}</span> Legendaries ready`
+              isDone
+                ? `<span class="goldnum">${Math.floor(total / LEGENDARY_UNITS)}</span> Legendary${Math.floor(total / LEGENDARY_UNITS) > 1 ? "s" : ""} ready`
                 : `<strong>${remainder}</strong> / 81 to next Legendary (${pct.toFixed(0)}%)`
             }
           </div>
@@ -739,15 +661,6 @@
                 e.target.value,
               );
             });
-            input.addEventListener(
-              "wheel",
-              (e) => {
-                e.preventDefault();
-                const tierIndex = parseInt(e.target.dataset.tier, 10);
-                step(orb.id, tierIndex, e.deltaY < 0 ? 1 : -1);
-              },
-              { passive: false },
-            );
           });
           card.querySelectorAll('[data-action="inc"]').forEach((btn) => {
             btn.addEventListener("click", () =>
@@ -759,9 +672,9 @@
               step(orb.id, parseInt(btn.dataset.tier, 10), -1),
             );
           });
-          const removeBtn = card.querySelector('[data-action="remove"]');
-          if (removeBtn) {
-            removeBtn.addEventListener("click", () => {
+          card
+            .querySelector('[data-action="remove"]')
+            .addEventListener("click", () => {
               if (
                 confirm(
                   `Remove ${orb.name} from your ledger? This can't be undone.`,
@@ -769,11 +682,9 @@
               )
                 removeOrb(orb.id);
             });
-          }
-          const mergeBtn = card.querySelector('[data-action="merge"]');
-          if (mergeBtn) {
-            mergeBtn.addEventListener("click", () => mergeOrb(orb.id));
-          }
+          card
+            .querySelector('[data-action="merge"]')
+            .addEventListener("click", () => mergeOrb(orb.id));
 
           grid.appendChild(card);
         });
@@ -787,43 +698,21 @@
 
       function renderQuickAdd() {
         const row = document.getElementById("quick-add-row");
-        // remove old buttons/dropdowns
+        // remove old chips
         row.querySelectorAll(".chip").forEach((c) => c.remove());
-        row.querySelectorAll(".sort-dropdown").forEach((d) => d.remove());
-
         const existingNames = new Set(orbs.map((o) => o.name.toLowerCase()));
         const remaining = SUGGESTED_ORBS.filter(
           (n) => !existingNames.has(n.toLowerCase()),
         );
-
-        // Add sort dropdown
-        if (orbs.length > 0) {
-          const sortDropdown = document.createElement("select");
-          sortDropdown.className = "sort-dropdown";
-          sortDropdown.innerHTML = `
-            <option value="alphabetical">Sort: Alphabetical</option>
-            <option value="most-completed">Sort: Most Completed</option>
-            <option value="least-completed">Sort: Least Completed</option>
-          `;
-          sortDropdown.value = currentSort;
-          sortDropdown.addEventListener("change", (e) => {
-            currentSort = e.target.value;
-            render();
-          });
-          row.appendChild(sortDropdown);
-        }
-
-        // Add auto-add all button
-        if (remaining.length > 0) {
-          const autoAddBtn = document.createElement("button");
-          autoAddBtn.className = "chip";
-          autoAddBtn.type = "button";
-          autoAddBtn.textContent = `Add All (${remaining.length})`;
-          autoAddBtn.addEventListener("click", () => {
-            remaining.forEach((name) => addOrb(name));
-          });
-          row.appendChild(autoAddBtn);
-        }
+        const addForm = row.querySelector(".add-form");
+        remaining.forEach((name) => {
+          const chip = document.createElement("button");
+          chip.className = "chip";
+          chip.type = "button";
+          chip.textContent = "+ " + name;
+          chip.addEventListener("click", () => addOrb(name));
+          row.insertBefore(chip, addForm);
+        });
       }
 
       function escapeHtml(str) {
